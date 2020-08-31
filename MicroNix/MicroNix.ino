@@ -144,14 +144,10 @@ void setup() {
 
 // LOOP
 void loop() {
-  static unsigned long timeRefresh = millis();
-  //static DateTime testTime = DateTime(now);
-  
+  static unsigned long timeRefresh = millis();  
   
   wifiManager->run();
-//  Serial.println("run");
   DateTime testTime = grtc.now(); // test line to active the RTC get command, this works
-//  Serial.println(testTime.second());
   
   // update the clock and time periodically
   long timePassed = millis() - timeRefresh;
@@ -159,7 +155,6 @@ void loop() {
   {
     Serial.println(timePassed > 2000);
     time.get();
-//    Serial.println("passed time update");
     printStatus();
 //    nixie->setTime();
 

@@ -65,7 +65,7 @@ bool timeManager::sync()
       }
 
       // adjust the RTC and set the synced state
-      grtc.adjust(DateTime(unixTime));
+      grtc.calibrateOrAdjust(DateTime(unixTime));
       wifiSynced = true;
       return true;
     }
