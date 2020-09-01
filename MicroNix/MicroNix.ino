@@ -24,6 +24,8 @@ WiFiUDP gudp;                            // udp instance
 IPAddress gtimeServer(129, 6, 15, 28);   // time server class
 DateTime gnow(0);
 
+LCDMenuLib2_menu LCDML_0 (255, 0, 0, NULL, NULL); // root menu element
+//LCDMenuLib2 LCDML(LCDML_0, _LCDML_DISP_rows, lcdMenu::display, lcdMenu::clear, lcdMenu::control);
 
 // REFERENCE POINTERS
 
@@ -69,7 +71,7 @@ void setup() {
   delay(1000);
 
   Serial.println("start pins");
-  // set up pin modes
+  
   // INPUT
   pinMode(encoderPinA, INPUT_PULLUP);
   pinMode(encoderPinB, INPUT_PULLUP);
@@ -87,8 +89,6 @@ void setup() {
   pinMode(anodePin_c, OUTPUT);
   pinMode(anodePin_d, OUTPUT);
 
-
-  Serial.println("start RTC");
   // grtc Configuration
   while (!grtc.begin()) { // Initialize grtc communications
     Serial.println("Unable to find MCP7940. Checking again in 1 second.");
@@ -111,17 +111,12 @@ void setup() {
     grtc.clearPowerFail();
   }
 
-  Serial.println("start time");
-
   gnow = 0;
-  
 
-
-
+  // Instanciate nixie manager
   nixieManager snixie(gleftHour, grightHour, gleftMin, grightMin, ghourZero, gminZero, gperiods, gcathodeTime, gnow);
   nixie = &snixie;
 
-  Serial.println("Start RGB");
   // initialize RGB Leds
   FastLED.addLeds<WS2812, ledPin, GRB>(leds, numLED);
 
@@ -134,7 +129,6 @@ void setup() {
   wifiManager = new WiFiManager_NINA_Lite();
   wifiManager->begin();
 
-  Serial.println("start timer interrupt");
   // establish timer interrupt
   TimerLib.setInterval_us(nixieISR, 4000);  
 
@@ -144,10 +138,14 @@ void setup() {
 
 // LOOP
 void loop() {
-  static unsigned long timeRefresh = millis();  
+  static unsigned long timeRefresh = millis();
+  //static DateTime testTime = DateTime(now);
+  
   
   wifiManager->run();
+//  Serial.println("run");
   DateTime testTime = grtc.now(); // test line to active the RTC get command, this works
+//  Serial.println(testTime.second());
   
   // update the clock and time periodically
   long timePassed = millis() - timeRefresh;
@@ -155,6 +153,7 @@ void loop() {
   {
     Serial.println(timePassed > 2000);
     time.get();
+//    Serial.println("passed time update");
     printStatus();
 //    nixie->setTime();
 

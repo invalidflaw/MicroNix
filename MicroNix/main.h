@@ -11,9 +11,11 @@
 #include <MCP7940.h>            // external RTC library
 #include <FastLED.h>            // neopixel LED library
 #include <U8g2lib.h>            // LCD library
+#include <LCDMenuLib2.h>        // LCD Menu Library
 #include "uTimerLib.h"          // timer interrupt library
 
 // MODULE DEFINES
 #include "timeManager.h"
 #include "nixieManager.h"
 #include "ledManager.h"
+#include "lcdMenu.h"

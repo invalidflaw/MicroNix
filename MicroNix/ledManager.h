@@ -6,7 +6,7 @@ class ledManager
   public:
   ledManager();
 
-  void refresh();
+  void update();
 
   private:
 };
