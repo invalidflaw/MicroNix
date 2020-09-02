@@ -1,18 +1,15 @@
 #pragma once
 #include "main.h"
 
-class lcdMenu
-{
-  public:
+extern LCDMenuLib2 LCDML;
+extern Encoder enc;
+extern U8G2_SSD1306_128X64_NONAME_F_4W_HW_SPI display;
 
-    lcdMenu();
-    
-    // lcd menu display function
-    static void display();
+// lcd menu display function
+//void menuDisplay();
 
-    // lcd menu clear function
-    static void clear();
+// lcd menu clear function
+void menuClear();
 
-    // lcd menu user input function
-    static void control();
-};
+// lcd menu user input function
+void menuControl();

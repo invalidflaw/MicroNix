@@ -24,10 +24,24 @@ WiFiUDP gudp;                            // udp instance
 IPAddress gtimeServer(129, 6, 15, 28);   // time server class
 DateTime gnow(0);
 
-LCDMenuLib2_menu LCDML_0 (255, 0, 0, NULL, NULL); // root menu element
-//LCDMenuLib2 LCDML(LCDML_0, _LCDML_DISP_rows, lcdMenu::display, lcdMenu::clear, lcdMenu::control);
+void menuDisplay();
 
-// REFERENCE POINTERS
+LCDMenuLib2_menu LCDML_0 (255, 0, 0, NULL, NULL); // root menu element
+LCDMenuLib2 LCDML(LCDML_0, _LCDML_DISP_rows, _LCDML_DISP_cols,menuDisplay, menuClear, menuControl);
+
+// Menu Construction
+LCDML_add (0  , LCDML_0      , 1  , "Time Settings"      , NULL);
+LCDML_add (1  , LCDML_0      , 2  , "LED Settings"       , NULL);
+LCDML_add (2  , LCDML_0      , 3  , "Back"               , NULL);
+
+
+
+// menu element count - last element id
+// this value must be the same as the last menu element
+#define _LCDML_DISP_cnt    2
+
+// create menu
+LCDML_createMenu(_LCDML_DISP_cnt);
 
 // TIMER VARIABLES
 byte gleftHour = 10;
@@ -57,6 +71,7 @@ void setup() {
   // begin debug serial
   Serial.begin(9600);
 
+  // DEBUG startup hold
   while (!Serial) {
     ; // wait for serial port to connect. Needed for native USB
   }
@@ -120,9 +135,14 @@ void setup() {
   // initialize RGB Leds
   FastLED.addLeds<WS2812, ledPin, GRB>(leds, numLED);
 
+  // start display
   Serial.println("Start OLED");
-  // start OLED screen
   display.begin();
+
+  LCDML_setup(_LCDML_DISP_cnt);
+  LCDML.MENU_enRollover();
+//  LCDML.SCREEN_enable(mFunc_screensaver, 10000); // set to 10 seconds
+  LCDML.SCREEN_disable();
 
   Serial.println("start wifi");
   // start wifi manager
@@ -168,112 +188,7 @@ void loop() {
 
 
 // GLOBAL HELPER FUNCTIONS
-void nixieISR()
-{
-  static byte tubeIndex = 0;
-  if (gnixieActive)
-  {
-    switch (tubeIndex)
-    {     
-      case 0:
-        clearNixie(3); // shut off tube 4
-        if(ghourZero || gleftHour != 0)
-        {
-          setNixie(0, gleftHour);
-        }
-        tubeIndex++;
-        break;
-      case 1:
-        clearNixie(0);
-        setNixie(1, grightHour);
-        tubeIndex++;
-        break;
-      case 2:
-        clearNixie(1);
-        if(gminZero || gleftHour != 0)
-        {
-          setNixie(2, gleftMin);
-        }
-        tubeIndex++;
-        break;
-      case 3:
-        clearNixie(2);
-        setNixie(3, grightMin);
-        tubeIndex++;
-        break;
-      default:
-        tubeIndex = 0;
-    }
-    setNixiePeriod(tubeIndex, gperiods[tubeIndex]);
-  }
-  
-}
 
-// SN74141 : Truth Table
-//D C B A #
-//L,L,L,L 0
-//L,L,L,H 1
-//L,L,H,L 2
-//L,L,H,H 3
-//L,H,L,L 4
-//L,H,L,H 5
-//L,H,H,L 6
-//L,H,H,H 7
-//H,L,L,L 8
-//H,L,L,H 9
-
-void setNixie(byte tubeSelect, byte value)
-{
-  byte a,b,c,d;
-  a = 0; b = 0; c = 0; d = 0;
-  switch( value )
-  {
-    case 0: a=0;b=0;c=0;d=0;break;
-    case 1: a=1;b=0;c=0;d=0;break;
-    case 2: a=0;b=1;c=0;d=0;break;
-    case 3: a=1;b=1;c=0;d=0;break;
-    case 4: a=0;b=0;c=1;d=0;break;
-    case 5: a=1;b=0;c=1;d=0;break;
-    case 6: a=0;b=1;c=1;d=0;break;
-    case 7: a=1;b=1;c=1;d=0;break;
-    case 8: a=0;b=0;c=0;d=1;break;
-    case 9: a=1;b=0;c=0;d=1;break;
-    default: a=1;b=1;c=1;d=1;break;
-  }
-  
-   // Write the number binary
-   digitalWrite(tubePin_a, a);
-   digitalWrite(tubePin_b, b);
-   digitalWrite(tubePin_c, c);
-   digitalWrite(tubePin_d, d);
-
-   // Activate the correct anode
-   if(value > 9)
-   {
-    digitalWrite(anodes[tubeSelect], LOW);
-   }
-   else
-   {
-    digitalWrite(anodes[tubeSelect], HIGH);
-   }
-   
-}
-
-void setNixiePeriod(byte tubeSelect, bool state)
-{
-  digitalWrite(periodPin, state);
-  digitalWrite(anodes[tubeSelect], HIGH);
-}
-
-void clearNixie(byte tubeSelect)
-{
-  digitalWrite(tubePin_a, LOW);
-  digitalWrite(tubePin_b, LOW);
-  digitalWrite(tubePin_c, LOW);
-  digitalWrite(tubePin_d, LOW);
-  digitalWrite(periodPin, LOW);
-  digitalWrite(anodes[tubeSelect], LOW);
-}
 
 void printStatus ()
 {
@@ -283,4 +198,101 @@ void printStatus ()
   Serial.print(":");
   Serial.println(gnow.second());
   Serial.println(gnow.unixtime());
+}
+
+/* ******************************************************************** */
+void menuDisplay()
+/* ******************************************************************** */
+{
+  // for first test set font here
+  display.setFont(_LCDML_DISP_font);
+
+  // declaration of some variables
+  // ***************
+  // content variable
+  char content_text[_LCDML_DISP_cols];  // save the content text of every menu element
+  // menu element object
+  LCDMenuLib2_menu *tmp;
+  // some limit values
+  uint8_t i = LCDML.MENU_getScroll();
+  uint8_t maxi = _LCDML_DISP_rows + i;
+  uint8_t n = 0;
+
+   // init vars
+  uint8_t n_max             = (LCDML.MENU_getChilds() >= _LCDML_DISP_rows) ? _LCDML_DISP_rows : (LCDML.MENU_getChilds());
+
+  uint8_t scrollbar_min     = 0;
+  uint8_t scrollbar_max     = LCDML.MENU_getChilds();
+  uint8_t scrollbar_cur_pos = LCDML.MENU_getCursorPosAbs();
+  uint8_t scroll_pos        = ((1.*n_max * _LCDML_DISP_rows) / (scrollbar_max - 1) * scrollbar_cur_pos);
+
+  // generate content
+  display.clearBuffer();
+  n = 0;
+  i = LCDML.MENU_getScroll();
+  // update content
+  // ***************
+
+  // clear menu
+  // ***************
+
+  // check if this element has children
+  if ((tmp = LCDML.MENU_getDisplayedObj()) != NULL)
+  {
+    // loop to display lines
+    do
+    {
+      // check if a menu element has a condition and if the condition be true
+      if (tmp->checkCondition())
+      {
+        // check the type off a menu element
+        if(tmp->checkType_menu() == true)
+        {
+          // display normal content
+          LCDML_getContent(content_text, tmp->getID());
+          display.drawStr( _LCDML_DISP_box_x0+_LCDML_DISP_font_w + _LCDML_DISP_cur_space_behind, _LCDML_DISP_box_y0 + _LCDML_DISP_font_h * (n + 1), content_text);
+        }
+        else
+        {
+          if(tmp->checkType_dynParam()) {
+            tmp->callback(n);
+          }
+        }
+        // increment some values
+        i++;
+        n++;
+      }
+    // try to go to the next sibling and check the number of displayed rows
+    } while (((tmp = tmp->getSibling(1)) != NULL) && (i < maxi));
+  }
+
+  // set cursor
+  display.drawStr( _LCDML_DISP_box_x0+_LCDML_DISP_cur_space_before, _LCDML_DISP_box_y0 + _LCDML_DISP_font_h * (LCDML.MENU_getCursorPos() + 1),  _LCDML_DISP_cursor_char);
+
+  if(_LCDML_DISP_draw_frame == 1) {
+     display.drawFrame(_LCDML_DISP_box_x0, _LCDML_DISP_box_y0, (_LCDML_DISP_box_x1-_LCDML_DISP_box_x0), (_LCDML_DISP_box_y1-_LCDML_DISP_box_y0));
+  }
+
+  // display scrollbar when more content as rows available and with > 2
+  if (scrollbar_max > n_max && _LCDML_DISP_scrollbar_w > 2)
+  {
+    // set frame for scrollbar
+    display.drawFrame(_LCDML_DISP_box_x1 - _LCDML_DISP_scrollbar_w, _LCDML_DISP_box_y0, _LCDML_DISP_scrollbar_w, _LCDML_DISP_box_y1-_LCDML_DISP_box_y0);
+
+    // calculate scrollbar length
+    uint8_t scrollbar_block_length = scrollbar_max - n_max;
+    scrollbar_block_length = (_LCDML_DISP_box_y1-_LCDML_DISP_box_y0) / (scrollbar_block_length + _LCDML_DISP_rows);
+
+    //set scrollbar
+    if (scrollbar_cur_pos == 0) {                                   // top position     (min)
+      display.drawBox(_LCDML_DISP_box_x1 - (_LCDML_DISP_scrollbar_w-1), _LCDML_DISP_box_y0 + 1                                                     , (_LCDML_DISP_scrollbar_w-2)  , scrollbar_block_length);
+    }
+    else if (scrollbar_cur_pos == (scrollbar_max-1)) {            // bottom position  (max)
+      display.drawBox(_LCDML_DISP_box_x1 - (_LCDML_DISP_scrollbar_w-1), _LCDML_DISP_box_y1 - scrollbar_block_length                                , (_LCDML_DISP_scrollbar_w-2)  , scrollbar_block_length);
+    }
+    else {                                                                // between top and bottom
+      display.drawBox(_LCDML_DISP_box_x1 - (_LCDML_DISP_scrollbar_w-1), _LCDML_DISP_box_y0 + (scrollbar_block_length * scrollbar_cur_pos + 1),(_LCDML_DISP_scrollbar_w-2)  , scrollbar_block_length);
+    }
+  }
+  display.sendBuffer();
 }

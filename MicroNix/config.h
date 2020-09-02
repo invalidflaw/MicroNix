@@ -34,7 +34,12 @@ const int anodes[4] = {anodePin_a, anodePin_b, anodePin_c, anodePin_d};
 #define NTP_PACKET_SIZE 48
 #define localPort 2390
 
+// Encoder Navigation Options
 
+  #define g_LCDML_CONTROL_button_long_press    800   // ms
+  #define g_LCDML_CONTROL_button_short_press   120   // ms
+
+  #define ENCODER_OPTIMIZE_INTERRUPTS
 // LCD MENU OPTIONS
 
 

@@ -1,7 +1,6 @@
 #pragma once
 #include "main.h"
 
-// experimental external calls
 extern IPAddress gtimeServer;
 extern WiFiUDP gudp;
 extern DateTime gnow;
