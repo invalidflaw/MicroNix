@@ -24,21 +24,41 @@ WiFiUDP gudp;                            // udp instance
 IPAddress gtimeServer(129, 6, 15, 28);   // time server class
 DateTime gnow(0);
 
+// Create Flash Storage Instances
+//FlashStorage(my_flash_store, int);
+
 void menuDisplay();
 
 LCDMenuLib2_menu LCDML_0 (255, 0, 0, NULL, NULL); // root menu element
 LCDMenuLib2 LCDML(LCDML_0, _LCDML_DISP_rows, _LCDML_DISP_cols,menuDisplay, menuClear, menuControl);
 
 // Menu Construction
-LCDML_add (0  , LCDML_0      , 1  , "Time Settings"      , NULL);
-LCDML_add (1  , LCDML_0      , 2  , "LED Settings"       , NULL);
-LCDML_add (2  , LCDML_0      , 3  , "Back"               , NULL);
+LCDML_add (0  , LCDML_0      , 1  , "Clock Settings"     , NULL);
+LCDML_add (1  , LCDML_0_1    , 1  , "UTC Offset"         , NULL);
+LCDML_add (2  , LCDML_0_1    , 2  , "Auto DST"           , NULL);
+LCDML_add (3  , LCDML_0_1    , 3  , "12/24 Hours"        , NULL);
+LCDML_add (4  , LCDML_0_1    , 4  , "Protect Cathode"    , NULL);
+LCDML_add (5  , LCDML_0_1    , 5  , "Shutoff Settings"   , NULL);
+LCDML_add (6  , LCDML_0_1_5  , 1  , "Enable Auto Shutoff", NULL);
+LCDML_add (7  , LCDML_0_1_5  , 2  , "Start Time"         , NULL);
+LCDML_add (8  , LCDML_0_1_5  , 3  , "End Time"           , NULL);
+LCDML_add (9  , LCDML_0_1_5  , 4  , "Back"               , menuBack);
+LCDML_add (10 , LCDML_0_1    , 6  , "Show Zero"          , NULL);
+LCDML_add (11 , LCDML_0_1    , 7  , "Back"               , NULL);
+LCDML_add (12 , LCDML_0      , 2  , "LED Settings"       , NULL);
+LCDML_add (13 , LCDML_0_2    , 1  , "LED Mode"           , NULL);
+LCDML_add (14 , LCDML_0_2    , 2  , "LED Color"          , NULL);
+LCDML_add (15 , LCDML_0_2    , 3  , "LED Brightness"     , NULL);
+LCDML_add (16 , LCDML_0_2    , 4  , "Back"               , menuBack);
+LCDML_add (17 , LCDML_0      , 3  , "Other Settings"     , NULL);
+LCDML_add (18 , LCDML_0      , 4  , "Reset Wifi"         , NULL);
+LCDML_add (19 , LCDML_0      , 5  , "Exit"               , NULL);  // trigger screensaver here
 
 
 
 // menu element count - last element id
 // this value must be the same as the last menu element
-#define _LCDML_DISP_cnt    2
+#define _LCDML_DISP_cnt    19
 
 // create menu
 LCDML_createMenu(_LCDML_DISP_cnt);
@@ -57,12 +77,11 @@ bool gminZero = true;
 bool gnixieActive = false;
 bool gtimeCalibrated = true;
 
-// Time Sync Library Pointer
+// Time Control Library
 timeManager time;   
 
-// Nixie Control Library Pointer
-nixieManager* nixie;
-
+// Nixie Tube Manager
+nixieManager nixie;
 
 // Wifi Variables
 WiFiManager_NINA_Lite* wifiManager;
@@ -128,10 +147,6 @@ void setup() {
 
   gnow = 0;
 
-  // Instanciate nixie manager
-  nixieManager snixie(gleftHour, grightHour, gleftMin, grightMin, ghourZero, gminZero, gperiods, gcathodeTime, gnow);
-  nixie = &snixie;
-
   // initialize RGB Leds
   FastLED.addLeds<WS2812, ledPin, GRB>(leds, numLED);
 
@@ -161,21 +176,17 @@ void loop() {
   static unsigned long timeRefresh = millis();
   //static DateTime testTime = DateTime(now);
   
-  
   wifiManager->run();
-//  Serial.println("run");
-  DateTime testTime = grtc.now(); // test line to active the RTC get command, this works
-//  Serial.println(testTime.second());
+  LCDML.loop();
   
   // update the clock and time periodically
   long timePassed = millis() - timeRefresh;
   if(abs(timePassed > 2000))
   {
-    Serial.println(timePassed > 2000);
     time.get();
 //    Serial.println("passed time update");
     printStatus();
-//    nixie->setTime();
+//    nixie.setTime();
 
     timeRefresh = millis();
   }

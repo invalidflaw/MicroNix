@@ -13,3 +13,7 @@ void menuClear();
 
 // lcd menu user input function
 void menuControl();
+
+void screenSaver(uint8_t param);
+
+void menuBack(uint8_t param);

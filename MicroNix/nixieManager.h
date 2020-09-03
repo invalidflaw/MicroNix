@@ -1,11 +1,24 @@
 #pragma once
 #include "main.h"
 
+extern byte gleftHour;
+extern byte grightHour;
+extern byte gleftMin;
+extern byte grightMin;
+extern int  gtimeZone;
+extern int  gcathodeTime;
+extern bool gdstMode;
+extern bool gperiods[4];
+extern bool ghourZero;
+extern bool gminZero;   
+extern bool gnixieActive;
+extern bool gtimeCalibrated;
+extern DateTime gnow;
+
 class nixieManager
 {
   public:
-  nixieManager(byte& ileftHour, byte& irightHour, byte& ileftMin, byte& irightMin,bool& ihourZero, bool& iminZero,
-               bool (&iperiods)[4],int& icathodeTime ,DateTime& inow);
+  nixieManager();
 
     void cathodeProtect();
 
@@ -18,15 +31,5 @@ class nixieManager
     void update();
 
   private:
-    byte& leftHour;
-    byte& rightHour;
-    byte& leftMin;
-    byte& rightMin;
-    bool& hourZero;
-    bool& minZero;
-    bool (&periods)[4];
-    int&  cathodeTime;
-    DateTime& now;
-
     unsigned long lastCathodeTime;
 };

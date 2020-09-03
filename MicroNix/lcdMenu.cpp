@@ -91,3 +91,18 @@ void menuClear()
 {
   // clear menu function
 }
+
+void screenSaver(uint8_t param)
+{
+  
+}
+
+void menuBack(uint8_t param)
+{
+  if(LCDML.FUNC_setup())
+  {
+    LCDML_UNUSED(param);
+
+    LCDML.FUNC_goBackToMenu(1);
+  }
+}

@@ -1,29 +1,28 @@
 #include "nixieManager.h"
 
-nixieManager::nixieManager(byte& ileftHour, byte& irightHour, byte& ileftMin, byte& irightMin,bool& ihourZero, bool& iminZero, bool (&iperiods)[4], int& icathodeTime,DateTime& inow):leftHour(ileftHour),
-                           rightHour(irightHour), leftMin(ileftMin), rightMin(irightMin), hourZero(ihourZero), minZero(iminZero), periods(iperiods), cathodeTime(icathodeTime), now(inow)
+nixieManager::nixieManager()
 {
-  lastCathodeTime = now.unixtime();
+  lastCathodeTime = gnow.unixtime();
 }
 
 void nixieManager::setTime()
 {
   // 
-  byte hour = now.hour();
-  byte minute = now.minute();
+  byte hour = gnow.hour();
+  byte minute = gnow.minute();
 
   // update the nixie values
-  leftHour = hour / 10 % 10;
-  rightHour = hour % 10;
+  gleftHour = hour / 10 % 10;
+  grightHour = hour % 10;
   
-  leftMin = minute / 10 % 10;
-  rightMin = minute % 10;
+  gleftMin = minute / 10 % 10;
+  grightMin = minute % 10;
 
-  if(now.unixtime() > lastCathodeTime + (cathodeTime * 60))
+  if(gnow.unixtime() > lastCathodeTime + (gcathodeTime * 60))
   {
     cathodeProtect();
     Serial.println("run cathode protect");
-    lastCathodeTime = now.unixtime();
+    lastCathodeTime = gnow.unixtime();
   }
 
   
@@ -36,48 +35,48 @@ void nixieManager::cathodeProtect()
   bool hourOff = false;
   bool minOff = false;
 
-  if (!hourZero)
+  if (!ghourZero)
   {
     hourOff = true;
-    hourZero = true;
+    ghourZero = true;
   }
-  if (!minZero)
+  if (!gminZero)
   {
     minOff = true;
-    minZero = true;
+    gminZero = true;
   }
   for (int i = 0; i < 51; i++)
   {
     if(i < 21)
     {
-      rightMin++;
-      if(rightMin > 9) rightMin = 0;
+      grightMin++;
+      if(grightMin > 9) grightMin = 0;
     }
 
     if(i < 31)
     {
-      leftMin++;
-      if(leftMin > 9) leftMin = 0;
+      gleftMin++;
+      if(gleftMin > 9) gleftMin = 0;
     }
 
     if( i < 41)
     {
-      rightHour++;
-      if(rightHour > 9) rightHour = 0;
+      grightHour++;
+      if(grightHour > 9) grightHour = 0;
     }
     
-    leftHour++;   
-    if(leftHour > 9) leftHour = 0;
+    gleftHour++;   
+    if(gleftHour > 9) gleftHour = 0;
 
     
     delay(100);
   }
   if (hourOff)
   {
-    hourZero = false;
+    ghourZero = false;
   }
   if (minOff)
   {
-    minZero = false;
+    gminZero = false;
   }
 }
