@@ -1,6 +1,9 @@
 #pragma once
 #include "main.h"
 
+// extern data declarations
+extern CRGB leds[numLED];
+
 enum class ledColor{
   red,
   blue,
@@ -8,21 +11,22 @@ enum class ledColor{
   yellow,
   aqua,
   purple,
-  cycle,
   rainbow,
-  juggle,
   white
 };
 
-enum class ledPallete{
-  defaultpallete,
-  custom
+enum class ledPalette{
+  rainbow,
+  forest,
+  lava
 };
 
 enum class ledEffect{
-  glitter,
+  solid,
+  solidGlitter,
+  pusleGlitter,
   pulse,
-  bpm,
+  juggle,
   confetti
 };
 
@@ -32,7 +36,9 @@ class ledManager
   ledManager();
 
   void update();
-  void setMode(ledColor color);
+  void setColor(ledColor color);
+  void setPalette(ledPalette color);
+  void setEffect(ledEffect effect);
   
 
   private:

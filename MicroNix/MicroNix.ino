@@ -148,7 +148,7 @@ void setup() {
   gnow = 0;
 
   // initialize RGB Leds
-  FastLED.addLeds<WS2812, ledPin, GRB>(leds, numLED);
+  FastLED.addLeds<WS2812, ledPin, GRB>(leds, numLED).setCorrection(TypicalLEDStrip);
 
   // start display
   Serial.println("Start OLED");
