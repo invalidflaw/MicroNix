@@ -169,9 +169,43 @@ void offsetParam(uint8_t line)
         }
         LCDML.BT_resetEnter();
       }
+
+      // only works when MENU_disScroll is set
+      if(LCDML.BT_checkUp())
+      {
+        dynamParams::utcOffset++;
+        LCDML.BT_resetUp();
+      }
+
+      // only works when MENU_disScroll is set
+      if(LCDML.BT_checkDown())
+      {
+        dynamParams::utcOffset--;
+        LCDML.BT_resetDown();
+      }
+
+      if(LCDML.BT_checkLeft())
+      {
+        dynamParams::utcOffset++;
+        LCDML.BT_resetLeft();
+      }
+      if(LCDML.BT_checkRight())
+      {
+        dynamParams::utcOffset--;
+        LCDML.BT_resetRight();
+      }
     }
   }
+
+  char buf[20];
+  sprintf (buf, "dynValue: %d", dynamParams::utcOffset);
+
+  //draw line
+  display.drawStr( _LCDML_DISP_box_x0+_LCDML_DISP_font_w + _LCDML_DISP_cur_space_behind,  (_LCDML_DISP_font_h * (1+line)), buf);
+
+  // CONSIDER SAVING TO FLASH HERE!!!!
 }
+
 
 
 /* ******************************************************************** */

@@ -41,26 +41,26 @@ LCDMenuLib2_menu LCDML_0 (255, 0, 0, NULL, NULL); // root menu element
 LCDMenuLib2 LCDML(LCDML_0, _LCDML_DISP_rows, _LCDML_DISP_cols,menuDisplay, menuClear, menuControl);
 
 // Menu Construction
-LCDML_add (0  , LCDML_0      , 1  , "Clock Settings"     , NULL);
-LCDML_add (1  , LCDML_0_1    , 1  , "UTC Offset"         , NULL);  // dynamic int parameter
-LCDML_add (2  , LCDML_0_1    , 2  , "Auto DST"           , NULL);  // boolean parameter
-LCDML_add (3  , LCDML_0_1    , 3  , "12/24 Hours"        , NULL);  // enum boolean parameter 
-LCDML_add (4  , LCDML_0_1    , 4  , "Protect Cathode"    , NULL);  // dynamic int parameter
-LCDML_add (5  , LCDML_0_1    , 5  , "Shutoff Settings"   , NULL);  
-LCDML_add (6  , LCDML_0_1_5  , 1  , "Enable Auto Shutoff", NULL);  // boolean parameter
-LCDML_add (7  , LCDML_0_1_5  , 2  , "Start Time"         , NULL);  // int parameter, 30 min interval
-LCDML_add (8  , LCDML_0_1_5  , 3  , "End Time"           , NULL);  // int parameter, 30 min interval
-LCDML_add (9  , LCDML_0_1_5  , 4  , "Back"               , menuBack);
-LCDML_add (10 , LCDML_0_1    , 6  , "Show Zero"          , NULL);  // boolean parameter
-LCDML_add (11 , LCDML_0_1    , 7  , "Back"               , NULL);
-LCDML_add (12 , LCDML_0      , 2  , "LED Settings"       , NULL);
-LCDML_add (13 , LCDML_0_2    , 1  , "LED Color"          , NULL);  // enum parameter
-LCDML_add (14 , LCDML_0_2    , 2  , "LED Effect"         , NULL);  // enum parameter
-LCDML_add (15 , LCDML_0_2    , 3  , "LED Brightness"     , NULL);  // enum parameter
-LCDML_add (16 , LCDML_0_2    , 4  , "Back"               , menuBack);
-LCDML_add (17 , LCDML_0      , 3  , "Other Settings"     , NULL);
-LCDML_add (18 , LCDML_0      , 4  , "Reset Wifi"         , NULL);
-LCDML_add (19 , LCDML_0      , 5  , "Exit"               , screenSaver);
+LCDML_add         (0  , LCDML_0      , 1  , "Clock Settings"     , NULL);
+LCDML_addAdvanced (1  , LCDML_0_1    , 1  , NULL   , ""      , offsetParam,    0,  _LCDML_TYPE_dynParam);  // dynamic int parameter
+LCDML_add         (2  , LCDML_0_1    , 2  , "Auto DST"           , NULL);  // boolean parameter
+LCDML_add         (3  , LCDML_0_1    , 3  , "12/24 Hours"        , NULL);  // enum boolean parameter 
+LCDML_add         (4  , LCDML_0_1    , 4  , "Protect Cathode"    , NULL);  // dynamic int parameter
+LCDML_add         (5  , LCDML_0_1    , 5  , "Shutoff Settings"   , NULL);  
+LCDML_add         (6  , LCDML_0_1_5  , 1  , "Enable Auto Shutoff", NULL);  // boolean parameter
+LCDML_add         (7  , LCDML_0_1_5  , 2  , "Start Time"         , NULL);  // int parameter, 30 min interval
+LCDML_add         (8  , LCDML_0_1_5  , 3  , "End Time"           , NULL);  // int parameter, 30 min interval
+LCDML_add         (9  , LCDML_0_1_5  , 4  , "Back"               , menuBack);
+LCDML_add         (10 , LCDML_0_1    , 6  , "Show Zero"          , NULL);  // boolean parameter
+LCDML_add         (11 , LCDML_0_1    , 7  , "Back"               , NULL);
+LCDML_add         (12 , LCDML_0      , 2  , "LED Settings"       , NULL);
+LCDML_add         (13 , LCDML_0_2    , 1  , "LED Color"          , NULL);  // enum parameter
+LCDML_add         (14 , LCDML_0_2    , 2  , "LED Effect"         , NULL);  // enum parameter
+LCDML_add         (15 , LCDML_0_2    , 3  , "LED Brightness"     , NULL);  // enum parameter
+LCDML_add         (16 , LCDML_0_2    , 4  , "Back"               , menuBack);
+LCDML_add         (17 , LCDML_0      , 3  , "Other Settings"     , NULL);
+LCDML_add         (18 , LCDML_0      , 4  , "Reset Wifi"         , NULL);
+LCDML_add         (19 , LCDML_0      , 5  , "Exit"               , screenSaver);
 
 
 
