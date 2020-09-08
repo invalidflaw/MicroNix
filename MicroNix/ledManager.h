@@ -39,7 +39,14 @@ class ledManager
   void setColor(ledColor color);
   void setPalette(ledPalette color);
   void setEffect(ledEffect effect);
-  
+  void setBright(byte ledBright);
+  void setEffectRate(byte ledEffectRate);
 
   private:
+  byte color = 0;
+  byte palette = 0;
+  byte effect = 0;
+  byte effectRate = 1;
+  byte brightness = 50;
+  
 };

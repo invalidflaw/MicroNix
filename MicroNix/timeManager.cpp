@@ -1,11 +1,17 @@
 #include "timeManager.h"
 
+
+/* ******************************************************************** */
 timeManager::timeManager()
+/* ******************************************************************** */
 {
   lastSync = gnow.unixtime();
 }
 
+
+/* ******************************************************************** */
 void timeManager::get()
+/* ******************************************************************** */
 {
 //  Serial.println("RTC Time update"); 
 //  gnow = rtc.now(); // THIS CALL HANGS, the assignment to "now" caused this hang, passed next line
@@ -28,7 +34,10 @@ void timeManager::get()
   }
 }
 
+
+/* ******************************************************************** */
 bool timeManager::sync()
+/* ******************************************************************** */
 {
   Serial.println("check status");
   if(WiFi.status() == 3)
@@ -79,7 +88,10 @@ bool timeManager::sync()
   return false;
 }
 
+
+/* ******************************************************************** */
 void timeManager::sendNTPpacket()
+/* ******************************************************************** */
 {
   // Clear NTP packet buffer
   memset(packetBuffer, 0, NTP_PACKET_SIZE);
@@ -104,7 +116,10 @@ void timeManager::sendNTPpacket()
   Serial.println("udp sent out");
 }
 
+
+/* ******************************************************************** */
 void timeManager::dstCheck()
+/* ******************************************************************** */
 {
   
 }

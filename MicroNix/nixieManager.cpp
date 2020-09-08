@@ -1,6 +1,9 @@
 #include "nixieManager.h"
 
+
+/* ******************************************************************** */
 nixieManager::nixieManager()
+/* ******************************************************************** */
 {
   lastCathodeTime = gnow.unixtime();
 }
@@ -28,7 +31,10 @@ void nixieManager::setTime()
   
 }
 
+
+/* ******************************************************************** */
 void nixieManager::cathodeProtect()
+/* ******************************************************************** */
 {
   // lock out user interface, run protect algorithm
   // enable the left hour in minute temporarily if needed

@@ -26,6 +26,14 @@ DateTime gnow(0);
 
 // Create Flash Storage Instances
 //FlashStorage(my_flash_store, int);
+FlashStorage(utcOffset, int);
+FlashStorage(autoDST, bool);
+FlashStorage(milTime, bool);
+FlashStorage(protectTime, int);
+FlashStorage(autoShutoff, bool);
+FlashStorage(startTime, int);
+FlashStorage(stopTime, int);
+FlashStorage(showZero, bool);
 
 void menuDisplay();
 
@@ -34,25 +42,25 @@ LCDMenuLib2 LCDML(LCDML_0, _LCDML_DISP_rows, _LCDML_DISP_cols,menuDisplay, menuC
 
 // Menu Construction
 LCDML_add (0  , LCDML_0      , 1  , "Clock Settings"     , NULL);
-LCDML_add (1  , LCDML_0_1    , 1  , "UTC Offset"         , NULL);
-LCDML_add (2  , LCDML_0_1    , 2  , "Auto DST"           , NULL);
-LCDML_add (3  , LCDML_0_1    , 3  , "12/24 Hours"        , NULL);
-LCDML_add (4  , LCDML_0_1    , 4  , "Protect Cathode"    , NULL);
-LCDML_add (5  , LCDML_0_1    , 5  , "Shutoff Settings"   , NULL);
-LCDML_add (6  , LCDML_0_1_5  , 1  , "Enable Auto Shutoff", NULL);
-LCDML_add (7  , LCDML_0_1_5  , 2  , "Start Time"         , NULL);
-LCDML_add (8  , LCDML_0_1_5  , 3  , "End Time"           , NULL);
+LCDML_add (1  , LCDML_0_1    , 1  , "UTC Offset"         , NULL);  // dynamic int parameter
+LCDML_add (2  , LCDML_0_1    , 2  , "Auto DST"           , NULL);  // boolean parameter
+LCDML_add (3  , LCDML_0_1    , 3  , "12/24 Hours"        , NULL);  // enum boolean parameter 
+LCDML_add (4  , LCDML_0_1    , 4  , "Protect Cathode"    , NULL);  // dynamic int parameter
+LCDML_add (5  , LCDML_0_1    , 5  , "Shutoff Settings"   , NULL);  
+LCDML_add (6  , LCDML_0_1_5  , 1  , "Enable Auto Shutoff", NULL);  // boolean parameter
+LCDML_add (7  , LCDML_0_1_5  , 2  , "Start Time"         , NULL);  // int parameter, 30 min interval
+LCDML_add (8  , LCDML_0_1_5  , 3  , "End Time"           , NULL);  // int parameter, 30 min interval
 LCDML_add (9  , LCDML_0_1_5  , 4  , "Back"               , menuBack);
-LCDML_add (10 , LCDML_0_1    , 6  , "Show Zero"          , NULL);
+LCDML_add (10 , LCDML_0_1    , 6  , "Show Zero"          , NULL);  // boolean parameter
 LCDML_add (11 , LCDML_0_1    , 7  , "Back"               , NULL);
 LCDML_add (12 , LCDML_0      , 2  , "LED Settings"       , NULL);
-LCDML_add (13 , LCDML_0_2    , 1  , "LED Mode"           , NULL);
-LCDML_add (14 , LCDML_0_2    , 2  , "LED Color"          , NULL);
-LCDML_add (15 , LCDML_0_2    , 3  , "LED Brightness"     , NULL);
+LCDML_add (13 , LCDML_0_2    , 1  , "LED Color"          , NULL);  // enum parameter
+LCDML_add (14 , LCDML_0_2    , 2  , "LED Effect"         , NULL);  // enum parameter
+LCDML_add (15 , LCDML_0_2    , 3  , "LED Brightness"     , NULL);  // enum parameter
 LCDML_add (16 , LCDML_0_2    , 4  , "Back"               , menuBack);
 LCDML_add (17 , LCDML_0      , 3  , "Other Settings"     , NULL);
 LCDML_add (18 , LCDML_0      , 4  , "Reset Wifi"         , NULL);
-LCDML_add (19 , LCDML_0      , 5  , "Exit"               , NULL);  // trigger screensaver here
+LCDML_add (19 , LCDML_0      , 5  , "Exit"               , screenSaver);
 
 
 
@@ -86,14 +94,27 @@ nixieManager nixie;
 // Wifi Variables
 WiFiManager_NINA_Lite* wifiManager;
 
-void setup() {
+
+/* ******************************************************************** */
+void setup() 
+/* ******************************************************************** */
+  {
+  /*
+   * HARDWARE SETUP ORDER
+   * 1. Serial(debug purposes)
+   * 2. UDP
+   * 3. PINS
+   * 3. RTC, grtc class setup
+   * 4. RGB LEDS
+   * 5  FLASH STORAGE (proposed init to dynamParams class
+   * 6. DISPLAY
+   * 7. LCD MENU
+   * 8. WIFI MANAGER
+   * 9. TIMER INTERRUPT
+   */
+    
   // begin debug serial
   Serial.begin(9600);
-
-  // DEBUG startup hold
-  while (!Serial) {
-    ; // wait for serial port to connect. Needed for native USB
-  }
 
   // begin the udp instance for wifi packets
   bool state = gudp.begin(localPort);
@@ -103,15 +124,13 @@ void setup() {
   Serial.println(state);
 
   delay(1000);
-
-  Serial.println("start pins");
   
-  // INPUT
+  // INPUT PINS
   pinMode(encoderPinA, INPUT_PULLUP);
   pinMode(encoderPinB, INPUT_PULLUP);
   pinMode(buttonPin, INPUT_PULLUP);
 
-  // OUTPUT
+  // OUTPUT PINS
   pinMode(tubePin_a, OUTPUT);
   pinMode(tubePin_b, OUTPUT);
   pinMode(tubePin_c, OUTPUT);
@@ -150,14 +169,26 @@ void setup() {
   // initialize RGB Leds
   FastLED.addLeds<WS2812, ledPin, GRB>(leds, numLED).setCorrection(TypicalLEDStrip);
 
+  // intitialize settings from flash storage values
+dynamParams::utcOffset = utcOffset.read();
+dynamParams::autoDST = autoDST.read();
+dynamParams::milTime = milTime.read();
+dynamParams::protectTime = protectTime.read();
+dynamParams::autoShutoff = autoShutoff.read();
+dynamParams::startTime = startTime.read();
+dynamParams::stopTime = stopTime.read();
+dynamParams::showZero = showZero.read();
+
+
   // start display
   Serial.println("Start OLED");
   display.begin();
 
+  // start lcd menu
   LCDML_setup(_LCDML_DISP_cnt);
   LCDML.MENU_enRollover();
-//  LCDML.SCREEN_enable(mFunc_screensaver, 10000); // set to 10 seconds
-  LCDML.SCREEN_disable();
+  LCDML.SCREEN_enable(screenSaver, 10000); // set to 10 seconds
+
 
   Serial.println("start wifi");
   // start wifi manager
@@ -171,8 +202,11 @@ void setup() {
 }
 
 
-// LOOP
-void loop() {
+/* ******************************************************************** */
+// MAIN LOOP
+void loop() 
+/* ******************************************************************** */
+{
   static unsigned long timeRefresh = millis();
   //static DateTime testTime = DateTime(now);
   
@@ -200,8 +234,9 @@ void loop() {
 
 // GLOBAL HELPER FUNCTIONS
 
-
+/* ******************************************************************** */
 void printStatus ()
+/* ******************************************************************** */
 {
   Serial.print(gnow.hour());
   Serial.print(":");
@@ -210,6 +245,7 @@ void printStatus ()
   Serial.println(gnow.second());
   Serial.println(gnow.unixtime());
 }
+
 
 /* ******************************************************************** */
 void menuDisplay()
