@@ -42,31 +42,35 @@ LCDMenuLib2 LCDML(LCDML_0, _LCDML_DISP_rows, _LCDML_DISP_cols,menuDisplay, menuC
 
 // Menu Construction
 LCDML_add         (0  , LCDML_0      , 1  , "Clock Settings"     , NULL);
-LCDML_addAdvanced (1  , LCDML_0_1    , 1  , NULL   , ""      , offsetParam,    0,  _LCDML_TYPE_dynParam);  // dynamic int parameter
-LCDML_add         (2  , LCDML_0_1    , 2  , "Auto DST"           , NULL);  // boolean parameter
-LCDML_add         (3  , LCDML_0_1    , 3  , "12/24 Hours"        , NULL);  // enum boolean parameter 
-LCDML_add         (4  , LCDML_0_1    , 4  , "Protect Cathode"    , NULL);  // dynamic int parameter
+LCDML_addAdvanced (1  , LCDML_0_1    , 1  , NULL   , ""          , offsetParam   ,  0  ,  _LCDML_TYPE_dynParam);  // dynamic int parameter
+LCDML_addAdvanced (2  , LCDML_0_1    , 2  , NULL   , ""          , dstParam      ,  0  ,  _LCDML_TYPE_dynParam);  // boolean parameter
+LCDML_addAdvanced (3  , LCDML_0_1    , 3  , NULL   , ""          , milParam      ,  0  ,  _LCDML_TYPE_dynParam);  // enum boolean parameter   //change parameter callback
+LCDML_addAdvanced (4  , LCDML_0_1    , 4  , NULL   , ""          , dynCathParam  ,  0  ,  _LCDML_TYPE_dynParam);  // dynamic int parameter
 LCDML_add         (5  , LCDML_0_1    , 5  , "Shutoff Settings"   , NULL);  
-LCDML_add         (6  , LCDML_0_1_5  , 1  , "Enable Auto Shutoff", NULL);  // boolean parameter
-LCDML_add         (7  , LCDML_0_1_5  , 2  , "Start Time"         , NULL);  // int parameter, 30 min interval
-LCDML_add         (8  , LCDML_0_1_5  , 3  , "End Time"           , NULL);  // int parameter, 30 min interval
-LCDML_add         (9  , LCDML_0_1_5  , 4  , "Back"               , menuBack);
-LCDML_add         (10 , LCDML_0_1    , 6  , "Show Zero"          , NULL);  // boolean parameter
-LCDML_add         (11 , LCDML_0_1    , 7  , "Back"               , NULL);
-LCDML_add         (12 , LCDML_0      , 2  , "LED Settings"       , NULL);
-LCDML_add         (13 , LCDML_0_2    , 1  , "LED Color"          , NULL);  // enum parameter
-LCDML_add         (14 , LCDML_0_2    , 2  , "LED Effect"         , NULL);  // enum parameter
-LCDML_add         (15 , LCDML_0_2    , 3  , "LED Brightness"     , NULL);  // enum parameter
-LCDML_add         (16 , LCDML_0_2    , 4  , "Back"               , menuBack);
-LCDML_add         (17 , LCDML_0      , 3  , "Other Settings"     , NULL);
-LCDML_add         (18 , LCDML_0      , 4  , "Reset Wifi"         , NULL);
-LCDML_add         (19 , LCDML_0      , 5  , "Exit"               , screenSaver);
+LCDML_addAdvanced (6  , LCDML_0_1_5  , 1  , NULL   , ""          , shutoffParam  ,  0  ,  _LCDML_TYPE_dynParam);  // boolean parameter
+LCDML_addAdvanced (7  , LCDML_0_1_5  , 2  , NULL   , ""          , startParam    ,  0  ,  _LCDML_TYPE_dynParam);  // int parameter, 30 min interval
+LCDML_addAdvanced (8  , LCDML_0_1_5  , 3  , NULL   , ""          , stopParam     ,  0  ,  _LCDML_TYPE_dynParam);  // int parameter, 30 min interval
+LCDML_add         (9  , LCDML_0_1_5  , 4  , "Save Parameters"    , saveParamCall);
+LCDML_add         (10 , LCDML_0_1_5  , 5  , "Back"               , menuBack);
+LCDML_addAdvanced (11 , LCDML_0_1    , 6  , NULL   , ""          , zeroParam     ,  0  ,  _LCDML_TYPE_dynParam);  // boolean parameter
+LCDML_add         (12 , LCDML_0_1    , 7  , "Save Parameters"    , saveParamCall);
+LCDML_add         (13 , LCDML_0_1    , 8  , "Back"               , NULL);
+LCDML_add         (14 , LCDML_0      , 2  , "LED Settings"       , NULL);
+LCDML_add         (15 , LCDML_0_2    , 1  , "LED Color"          , NULL);  // enum parameter
+LCDML_add         (16 , LCDML_0_2    , 2  , "LED Effect"         , NULL);  // enum parameter
+LCDML_add         (17 , LCDML_0_2    , 3  , "LED Brightness"     , NULL);  // enum parameter
+LCDML_add         (18 , LCDML_0_2    , 4  , "Save Parameters"    , saveParamCall);
+LCDML_add         (19 , LCDML_0_2    , 5  , "Back"               , menuBack);
+LCDML_add         (20 , LCDML_0      , 3  , "Other Settings"     , NULL);
+LCDML_add         (21 , LCDML_0      , 4  , "Save Parameters"    , saveParamCall);
+LCDML_add         (22 , LCDML_0      , 5  , "Reset Wifi"         , NULL);
+LCDML_add         (23 , LCDML_0      , 6  , "Exit"               , screenSaver);
 
 
 
 // menu element count - last element id
 // this value must be the same as the last menu element
-#define _LCDML_DISP_cnt    19
+#define _LCDML_DISP_cnt    23
 
 // create menu
 LCDML_createMenu(_LCDML_DISP_cnt);
@@ -170,15 +174,7 @@ void setup()
   FastLED.addLeds<WS2812, ledPin, GRB>(leds, numLED).setCorrection(TypicalLEDStrip);
 
   // intitialize settings from flash storage values
-dynamParams::utcOffset = utcOffset.read();
-dynamParams::autoDST = autoDST.read();
-dynamParams::milTime = milTime.read();
-dynamParams::protectTime = protectTime.read();
-dynamParams::autoShutoff = autoShutoff.read();
-dynamParams::startTime = startTime.read();
-dynamParams::stopTime = stopTime.read();
-dynamParams::showZero = showZero.read();
-
+  loadParams();
 
   // start display
   Serial.println("Start OLED");
@@ -342,4 +338,33 @@ void menuDisplay()
     }
   }
   display.sendBuffer();
+}
+
+
+/* ******************************************************************** */
+void saveParams()
+/* ******************************************************************** */
+{
+  utcOffset.write(dynamParams::utcOffset);
+  autoDST.write(dynamParams::autoDST);
+  milTime.write(dynamParams::milTime);
+  protectTime.write(dynamParams::protectTime);
+  autoShutoff.write(dynamParams::autoShutoff);
+  startTime.write(dynamParams::startTime);
+  stopTime.write(dynamParams::stopTime);
+  showZero.write(dynamParams::showZero);
+}
+
+/* ******************************************************************** */
+void loadParams()
+/* ******************************************************************** */
+{
+  dynamParams::utcOffset = utcOffset.read();
+  dynamParams::autoDST = autoDST.read();
+  dynamParams::milTime = milTime.read();
+  dynamParams::protectTime = protectTime.read();
+  dynamParams::autoShutoff = autoShutoff.read();
+  dynamParams::startTime = startTime.read();
+  dynamParams::stopTime = stopTime.read();
+  dynamParams::showZero = showZero.read();
 }

@@ -147,6 +147,36 @@ void menuBack(uint8_t param)
 
 
 /* ******************************************************************** */
+void saveParamCall(uint8_t param)
+/* ******************************************************************** */
+{
+  if(LCDML.FUNC_setup())
+  {
+    LCDML_UNUSED(param);
+
+    // clear display, and flash saving image(white box currently
+    display.clear();
+    display.clearBuffer();
+    display.drawBox(0,0,128,64);
+    display.sendBuffer();
+
+    // save parameters to flash storage
+    saveParams();
+    delay(50);
+
+    // return to original menu
+    display.clear();
+    LCDML.FUNC_goBackToMenu();
+  }
+  
+  if(LCDML.FUNC_loop());
+
+  // stable end
+  if(LCDML.FUNC_close());
+}
+
+
+/* ******************************************************************** */
 void offsetParam(uint8_t line)
 /* ******************************************************************** */
 {
@@ -154,57 +184,278 @@ void offsetParam(uint8_t line)
   {
     if(LCDML.BT_checkAny())
     {
-      if(LCDML.BT_checkEnter())
-      {
-        // check scroll disable status
-        if(LCDML.MENU_getScrollDisableStatus() == 0)
-        {
-          // disable the up/down can be used
-          LCDML.MENU_disScroll();
-        }
-        else
-        {
-          // enable the normal scroll function
-          LCDML.MENU_enScroll();
-        }
-        LCDML.BT_resetEnter();
-      }
+      dynEnterCheck();
 
-      // only works when MENU_disScroll is set
-      if(LCDML.BT_checkUp())
-      {
-        dynamParams::utcOffset++;
-        LCDML.BT_resetUp();
-      }
-
-      // only works when MENU_disScroll is set
-      if(LCDML.BT_checkDown())
-      {
-        dynamParams::utcOffset--;
-        LCDML.BT_resetDown();
-      }
-
-      if(LCDML.BT_checkLeft())
-      {
-        dynamParams::utcOffset++;
-        LCDML.BT_resetLeft();
-      }
-      if(LCDML.BT_checkRight())
-      {
-        dynamParams::utcOffset--;
-        LCDML.BT_resetRight();
-      }
+      dynIntParameter(&dynamParams::utcOffset);
     }
   }
 
-  char buf[20];
-  sprintf (buf, "dynValue: %d", dynamParams::utcOffset);
+  char buf[25];
+  sprintf (buf, "UTC Offset: %d", dynamParams::utcOffset);
 
   //draw line
   display.drawStr( _LCDML_DISP_box_x0+_LCDML_DISP_font_w + _LCDML_DISP_cur_space_behind,  (_LCDML_DISP_font_h * (1+line)), buf);
 
   // CONSIDER SAVING TO FLASH HERE!!!!
 }
+
+
+/* ******************************************************************** */
+void dstParam(uint8_t line)
+/* ******************************************************************** */
+{
+  if (line == LCDML.MENU_getCursorPos())
+  {
+    if(LCDML.BT_checkAny())
+    {
+      dynEnterCheck();
+
+      dynBoolParameter(&dynamParams::autoDST);
+    }
+  }
+
+  char buf[25];
+  sprintf (buf, "Auto DST: %d", dynamParams::autoDST);
+
+  //draw line
+  display.drawStr( _LCDML_DISP_box_x0+_LCDML_DISP_font_w + _LCDML_DISP_cur_space_behind,  (_LCDML_DISP_font_h * (1+line)), buf);
+
+  // CONSIDER SAVING TO FLASH HERE!!!!
+}
+
+
+/* ******************************************************************** */
+void milParam(uint8_t line)
+/* ******************************************************************** */
+{
+  if (line == LCDML.MENU_getCursorPos())
+  {
+    if(LCDML.BT_checkAny())
+    {
+      dynEnterCheck();
+
+      dynBoolParameter(&dynamParams::milTime);
+    }
+  }
+
+  char buf[25];
+  sprintf (buf, "24hr Time: %d", dynamParams::milTime);
+
+  //draw line
+  display.drawStr( _LCDML_DISP_box_x0+_LCDML_DISP_font_w + _LCDML_DISP_cur_space_behind,  (_LCDML_DISP_font_h * (1+line)), buf);
+
+  // CONSIDER SAVING TO FLASH HERE!!!!
+}
+
+
+/* ******************************************************************** */
+void dynCathParam(uint8_t line)
+/* ******************************************************************** */
+{
+  if (line == LCDML.MENU_getCursorPos())
+  {
+    if(LCDML.BT_checkAny())
+    {
+      dynEnterCheck();
+
+      dynIntParameter(&dynamParams::protectTime, 5);
+    }
+  }
+  
+  char buf[25];
+  sprintf (buf, "Cathode Time: %d", dynamParams::protectTime);
+
+  //draw line
+  display.drawStr( _LCDML_DISP_box_x0+_LCDML_DISP_font_w + _LCDML_DISP_cur_space_behind,  (_LCDML_DISP_font_h * (1+line)), buf);
+
+  // CONSIDER SAVING TO FLASH HERE!!!!
+}
+
+
+/* ******************************************************************** */
+void shutoffParam(uint8_t line)
+/* ******************************************************************** */
+{
+  if (line == LCDML.MENU_getCursorPos())
+  {
+    if(LCDML.BT_checkAny())
+    {
+      dynEnterCheck();
+
+      dynBoolParameter(&dynamParams::autoShutoff);
+    }
+  }
+
+  char buf[25];
+  sprintf (buf, "Auto Shutoff: %d", dynamParams::autoShutoff);
+
+  //draw line
+  display.drawStr( _LCDML_DISP_box_x0+_LCDML_DISP_font_w + _LCDML_DISP_cur_space_behind,  (_LCDML_DISP_font_h * (1+line)), buf);
+
+  // CONSIDER SAVING TO FLASH HERE!!!!
+}
+
+
+/* ******************************************************************** */
+void startParam(uint8_t line)
+/* ******************************************************************** */
+{
+  if (line == LCDML.MENU_getCursorPos())
+  {
+    if(LCDML.BT_checkAny())
+    {
+      dynEnterCheck();
+
+      dynIntParameter(&dynamParams::startTime, 15);
+    }
+  }
+  
+  char buf[25];
+  sprintf (buf, "Start Time: %d", dynamParams::startTime);
+
+  //draw line
+  display.drawStr( _LCDML_DISP_box_x0+_LCDML_DISP_font_w + _LCDML_DISP_cur_space_behind,  (_LCDML_DISP_font_h * (1+line)), buf);
+
+  // CONSIDER SAVING TO FLASH HERE!!!!  
+}
+
+
+/* ******************************************************************** */
+void stopParam(uint8_t line)
+/* ******************************************************************** */
+{
+  if (line == LCDML.MENU_getCursorPos())
+  {
+    if(LCDML.BT_checkAny())
+    {
+      dynEnterCheck();
+
+      dynIntParameter(&dynamParams::stopTime, 15);
+    }
+  }
+  
+  char buf[25];
+  sprintf (buf, "Stop Time: %d", dynamParams::stopTime);
+
+  //draw line
+  display.drawStr( _LCDML_DISP_box_x0+_LCDML_DISP_font_w + _LCDML_DISP_cur_space_behind,  (_LCDML_DISP_font_h * (1+line)), buf);
+
+  // CONSIDER SAVING TO FLASH HERE!!!!
+}
+
+
+/* ******************************************************************** */
+void zeroParam(uint8_t line)
+/* ******************************************************************** */
+{
+  if (line == LCDML.MENU_getCursorPos())
+  {
+    if(LCDML.BT_checkAny())
+    {
+      dynEnterCheck();
+
+      dynBoolParameter(&dynamParams::showZero);
+    }
+  }
+
+  char buf[25];
+  sprintf (buf, "Show Zero: %d", dynamParams::showZero);
+
+  //draw line
+  display.drawStr( _LCDML_DISP_box_x0+_LCDML_DISP_font_w + _LCDML_DISP_cur_space_behind,  (_LCDML_DISP_font_h * (1+line)), buf);
+
+  // CONSIDER SAVING TO FLASH HERE!!!!
+}
+
+
+// HELPER FUNCTIONS
+/* ******************************************************************** */
+void dynEnterCheck()
+/* ******************************************************************** */
+{
+  if(LCDML.BT_checkEnter())
+  {
+    // check scroll disable status
+    if(LCDML.MENU_getScrollDisableStatus() == 0)
+    {
+      // disable the up/down can be used
+      LCDML.MENU_disScroll();
+    }
+    else
+    {
+      // enable the normal scroll function
+      LCDML.MENU_enScroll();
+    }
+    LCDML.BT_resetEnter();
+  }
+}
+
+
+/* ******************************************************************** */
+void dynBoolParameter(bool* param)
+/* ******************************************************************** */
+{
+
+  // only works when MENU_disScroll is set
+  if(LCDML.BT_checkUp())
+  {
+    dynamParams::utcOffset++;
+    LCDML.BT_resetUp();
+  }
+  
+  // only works when MENU_disScroll is set
+  if(LCDML.BT_checkDown())
+  {
+    *param = !*param;
+    LCDML.BT_resetDown();
+  }
+  
+  if(LCDML.BT_checkLeft())
+  {
+    *param = !*param;
+    LCDML.BT_resetLeft();
+  }
+  
+  if(LCDML.BT_checkRight())
+  {
+    *param = !*param;
+    LCDML.BT_resetRight();
+  }
+}
+
+
+/* ******************************************************************** */
+void dynIntParameter(int* param, int increment)
+/* ******************************************************************** */
+{
+  // only works when MENU_disScroll is set
+  if(LCDML.BT_checkUp())
+  {
+    *param += increment;
+    LCDML.BT_resetUp();
+  }
+  
+  // only works when MENU_disScroll is set
+  if(LCDML.BT_checkDown())
+  {
+    *param -= increment;
+    LCDML.BT_resetDown();
+  }
+  
+  if(LCDML.BT_checkLeft())
+  {
+    *param += increment;
+    LCDML.BT_resetLeft();
+  }
+  
+  if(LCDML.BT_checkRight())
+  {
+    *param -= increment;
+    LCDML.BT_resetRight();
+  }
+}
+
+
 
 
 
