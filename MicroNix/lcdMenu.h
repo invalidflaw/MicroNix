@@ -1,5 +1,6 @@
 #pragma once
 #include "main.h"
+#include "ledManager.h"
 
 extern LCDMenuLib2 LCDML;
 extern Encoder enc;
@@ -8,6 +9,7 @@ extern U8G2_SSD1306_128X64_NONAME_F_4W_HW_SPI display;
 // external flash storage objects
 extern void saveParams();
 
+//extern ledColor();
 
 // lcd menu display function
 void menuDisplay();
@@ -53,5 +55,8 @@ class dynamParams
     inline static int startTime = 7;
     inline static int stopTime = 18;
     inline static bool showZero = false;
+    inline static int lampColor = 0;
+
+    
   
 };

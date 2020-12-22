@@ -13,6 +13,7 @@
 #include <U8g2lib.h>            // LCD library
 #include <LCDMenuLib2.h>        // LCD Menu Library
 #include "uTimerLib.h"          // timer interrupt library
+#include <ArduinoJson.h>        // json library(weather data)
 
 
 // MODULE DEFINES

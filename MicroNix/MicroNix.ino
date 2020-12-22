@@ -8,11 +8,16 @@
 // I think the issue with time manager is related to the references for the class, any suggestion on fixes are appreciated.
 
 #include "main.h"
+#include "images.h"
 #include "uTimerLib.h"
 
 #include "wifiDefines.h"
 #include "Credentials.h"
 #include "dynamicParams.h"
+
+
+DynamicJsonDocument jsonBuffer(1000);
+
 
 // CLASS INSTANSIATION
 MCP7940_Class grtc;
@@ -41,6 +46,7 @@ LCDMenuLib2_menu LCDML_0 (255, 0, 0, NULL, NULL); // root menu element
 LCDMenuLib2 LCDML(LCDML_0, _LCDML_DISP_rows, _LCDML_DISP_cols,menuDisplay, menuClear, menuControl);
 
 // Menu Construction
+// Dev Notes, addadvanced calls may be formatted incorrectly
 LCDML_add         (0  , LCDML_0      , 1  , "Clock Settings"     , NULL);
 LCDML_addAdvanced (1  , LCDML_0_1    , 1  , NULL   , ""          , offsetParam   ,  0  ,  _LCDML_TYPE_dynParam);  // dynamic int parameter
 LCDML_addAdvanced (2  , LCDML_0_1    , 2  , NULL   , ""          , dstParam      ,  0  ,  _LCDML_TYPE_dynParam);  // boolean parameter
@@ -179,6 +185,10 @@ void setup()
   // start display
   Serial.println("Start OLED");
   display.begin();
+  display.clearBuffer();
+  display.drawXBM(0,0,huskerX, huskerY, huskerN);
+  display.sendBuffer();
+  delay(1000);
 
   // start lcd menu
   LCDML_setup(_LCDML_DISP_cnt);
@@ -195,6 +205,7 @@ void setup()
   TimerLib.setInterval_us(nixieISR, 4000);  
 
   Serial.println("startup complete");
+  display.clear();
 }
 
 
@@ -205,7 +216,7 @@ void loop()
 {
   static unsigned long timeRefresh = millis();
   //static DateTime testTime = DateTime(now);
-  
+  Serial.println("loop");
   wifiManager->run();
   LCDML.loop();
   
@@ -214,9 +225,9 @@ void loop()
   if(abs(timePassed > 2000))
   {
     time.get();
-//    Serial.println("passed time update");
+    Serial.println("passed time update");
     printStatus();
-//    nixie.setTime();
+//    nixie.setTime();    // this is causing a program hang
 
     timeRefresh = millis();
   }

@@ -31,5 +31,5 @@ class nixieManager
     void update();
 
   private:
-    unsigned long lastCathodeTime;
+    unsigned long lastCathodeTime = 0;
 };

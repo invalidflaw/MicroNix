@@ -31,6 +31,7 @@ void timeManager::get()
   {
     Serial.println("Disconnect Sync");
     wifiSynced = sync();
+    lastSync = gnow.unixtime();
   }
 }
 

@@ -5,22 +5,27 @@
 nixieManager::nixieManager()
 /* ******************************************************************** */
 {
-  lastCathodeTime = gnow.unixtime();
+//  lastCathodeTime = 0;
 }
 
+
+/* ******************************************************************** */
 void nixieManager::setTime()
+/* ******************************************************************** */
 {
-  // 
+  Serial.println("read time numbers"); 
   byte hour = gnow.hour();
   byte minute = gnow.minute();
 
   // update the nixie values
+  Serial.println("update tube values");
   gleftHour = hour / 10 % 10;
   grightHour = hour % 10;
   
   gleftMin = minute / 10 % 10;
   grightMin = minute % 10;
 
+  Serial.println("cathode check");
   if(gnow.unixtime() > lastCathodeTime + (gcathodeTime * 60))
   {
     cathodeProtect();
@@ -53,6 +58,7 @@ void nixieManager::cathodeProtect()
   }
   for (int i = 0; i < 51; i++)
   {
+    Serial.println("cathode protect");
     if(i < 21)
     {
       grightMin++;
