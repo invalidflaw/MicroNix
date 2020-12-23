@@ -1,7 +1,7 @@
 #pragma once
 #include "main.h"
-#include "ledManager.h"
 
+// EXTERNAL object declarations from main
 extern LCDMenuLib2 LCDML;
 extern Encoder enc;
 extern U8G2_SSD1306_128X64_NONAME_F_4W_HW_SPI display;
@@ -10,9 +10,6 @@ extern U8G2_SSD1306_128X64_NONAME_F_4W_HW_SPI display;
 extern void saveParams();
 
 //extern ledColor();
-
-// lcd menu display function
-//void menuDisplay();
 
 // lcd menu clear function
 void menuClear();
@@ -26,8 +23,6 @@ void saveParamCall(uint8_t param);
 // lcd dynamic parameter functions
 void screenSaver(uint8_t param);
 void menuBack(uint8_t param);
-void offsetParam(uint8_t line);
-void dstParam(uint8_t line);
 void milParam(uint8_t line);
 void dynCathParam(uint8_t line);
 void shutoffParam(uint8_t line);
@@ -47,15 +42,12 @@ class dynamParams
     dynamParams();
 
   public:
-    inline static int utcOffset = 0;
-    inline static bool autoDST = true;
     inline static bool milTime = false;
     inline static int protectTime = 15;
     inline static bool autoShutoff = false;
     inline static int startTime = 7;
     inline static int stopTime = 18;
     inline static bool showZero = false;
-    inline static int lampColor = 0;
 
     
   
