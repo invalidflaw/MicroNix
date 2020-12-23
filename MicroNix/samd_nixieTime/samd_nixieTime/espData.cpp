@@ -2,7 +2,7 @@
 
 String getWeather()
 {
-  SerialNina.print("getWeather>");
+  SerialNina.print("getweather>");
   while(!SerialNina.available())
   {
     delay(10);

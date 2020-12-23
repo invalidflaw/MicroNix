@@ -3,7 +3,7 @@
 // This program operates the MicroNix Nixie Tube Clock
 // Displays the current time from an grtc and updates
 // the clock via Wi-Fi once per day
-
+#define _LCDML_cfg_use_ram
 #include "main.h"
 
 // CLASS INSTANCES

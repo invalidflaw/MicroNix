@@ -9,7 +9,7 @@
   #error This code is intended to run on the ESP32 platform! Please check your Tools->Board setting.
 #endif
 
-#define TIME_ZONE_OFFSET_HRS            (-6)
+//#define TIME_ZONE_OFFSET_HRS            (-6)
 
 const String apiKey = "&APPID=1f217b9e242a7ee3867adb9b4bae55b2";
 const String apiCall = "http://api.openweathermap.org/data/2.5/weather?q=";
