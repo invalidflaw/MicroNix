@@ -19,3 +19,5 @@
 #include "lcdFunc.h"
 #include "nixieInterrupt.h"
 #include "espData.h"
+#include "nixieManager.h"
+#include "ledManager.h"

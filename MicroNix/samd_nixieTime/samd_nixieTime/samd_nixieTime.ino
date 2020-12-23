@@ -21,6 +21,9 @@ FlashStorage(startTime, int);
 FlashStorage(stopTime, int);
 FlashStorage(showZero, bool);
 
+// Nixie Tube Manager
+nixieManager nixie;
+
 void menuDisplay();
 
 LCDMenuLib2_menu LCDML_0 (255, 0, 0, NULL, NULL); // root menu element
@@ -53,14 +56,12 @@ LCDML_add         (17 , LCDML_0      , 6  , "Exit"               , screenSaver);
 // create menu
 LCDML_createMenu(_LCDML_DISP_cnt);
 
-// TIMER VARIABLES
+// CLOCK VARIABLES
 byte gleftHour = 10;
 byte grightHour = 10;
 byte gleftMin = 10;
 byte grightMin = 10;
-int  gtimeZone = -4;
 int  gcathodeTime = 15;
-bool gdstMode = true;
 bool gperiods[4] = {false,false,false,false};
 bool ghourZero = false;
 bool gminZero = true;   
@@ -145,7 +146,7 @@ void setup() {
 }
 
 
-// DEBUG
+// DEBUGge
 // time display, uncomment to see time in serial
 #define showTime
 /* ******************************************************************** */
@@ -157,6 +158,10 @@ void loop() {
   
   LCDML.loop();
   gnow = grtc.now();
+
+  // make this a timed event, we dont need to trigger it constantly
+  nixie.setTime();
+  
 
   // NTP TIME UPDATE EVENT
   if(abs(curTime - lastTimeNTP) > ntpRefreshDelay || timeUpdateFail == true)
