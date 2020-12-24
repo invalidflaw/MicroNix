@@ -3,6 +3,7 @@
 
 // extern data declarations
 extern CRGB leds[numLED];
+extern bool gholidayFun;
 
 enum class ledColor{
   red,
@@ -13,15 +14,23 @@ enum class ledColor{
   purple,
   white,
   rainbow,
+  randomDay,
   weather
 };
 
-enum class ledEffect{
+enum class patterns{
   solid,
   pulse,
-  juggle,
-  scanpulse
+  flow
 };
+//
+//// pattern functions
+//void showSolidColor();
+//void pulseSolidColor();
+//void flowSolidColor();
+//
+//// helper lighting functions
+//CRGB getColor();
 
 class ledManager
 {
@@ -29,20 +38,21 @@ class ledManager
     ledManager();
 
     void update();
+    void setSpeed(byte speed);
+    void setBright(byte bright);
+    void setPattern(patterns pattern);
     void setColor(ledColor color);
-//    void setPalette(ledPalette color);
-    void setEffect(ledEffect effect);
-    void setBright(byte ledBright);
-    void setEffectRate(byte ledEffectRate);
 
   private:
-    
+    void showSolidColor();
+    void pulseSolidColor();
+    void flowSolidColor();
+
+    CRGB getColor(byte stringLED);
 
   private:
-    byte color = 0;
-    byte palette = 0;
-    byte effect = 0;
-    byte effectRate = 1;
-    byte brightness = 50;
-  
+    patterns selPattern = patterns::pulse;
+    ledColor selColor = ledColor::red;
+    byte patternSpeed = 3;
+    byte ledBright = 15;
 };

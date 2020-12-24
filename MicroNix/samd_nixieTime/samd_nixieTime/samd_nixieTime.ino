@@ -2,7 +2,20 @@
 //
 // This program operates the MicroNix Nixie Tube Clock
 // Displays the current time from an grtc and updates
-// the clock via Wi-Fi once per day
+// the clock via Wi-Fi 
+
+// TODO:
+/*
+ * 1. Flesh Out LCD Menu, a number of the save callback functions are missing
+ * 2. Add Flash Saving, Finishing menu will tell me what values need saved
+ * 3. Fix cathodeprotect, it double triggers on startup and fails to end at correct time
+ * 4. Add screensaver to lcd, either current time or just a black screen
+ * 5. The time seems to be about a minute ahead, what is the source?
+ * 6. finish flow fade LED mode
+ * 7. Add weather color mode
+ * 8. add random day color mode
+ * 9. (idea), custom colors on some holidays(override setting?)
+ */
 #define _LCDML_cfg_use_ram
 #include "main.h"
 
@@ -23,6 +36,9 @@ FlashStorage(showZero, bool);
 
 // Nixie Tube Manager
 nixieManager nixie;
+
+// LED Manager
+ledManager ledDriver;
 
 void menuDisplay();
 
@@ -65,8 +81,10 @@ int  gcathodeTime = 15;
 bool gperiods[4] = {false,false,false,false};
 bool ghourZero = false;
 bool gminZero = true;   
-bool gnixieActive = false;
+bool gnixieActive = true;
 bool gtimeCalibrated = true;
+// idea piece to add holiday color schemes(later)
+bool gholidayFun = false;
 
 // Time check failure status
 bool timeUpdateFail = true;
@@ -118,7 +136,8 @@ void setup() {
   gnow = 0;
 
   // initialize RGB Leds
-  FastLED.addLeds<WS2812, ledPin, GRB>(leds, numLED).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<WS2812, ledPin, colorOrder>(leds, numLED).setCorrection(TypicalLEDStrip);
+  // TODO: implement settings load commands for the LED driver
 
   // intitialize settings from flash storage values
   loadParams();
@@ -161,6 +180,8 @@ void loop() {
 
   // make this a timed event, we dont need to trigger it constantly
   nixie.setTime();
+
+  ledDriver.update();
   
 
   // NTP TIME UPDATE EVENT

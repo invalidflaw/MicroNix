@@ -23,7 +23,7 @@ const int anodes[4] = {anodePin_a, anodePin_b, anodePin_c, anodePin_d};
 #define numLED 4
 #define ledBrightness 64
 #define LED_TYPE WS2812
-#define colorOrder GRB
+#define colorOrder RGB
 #define ledRefresh 20
 
 #define rtcAddr 0x27
